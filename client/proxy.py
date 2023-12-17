@@ -1,9 +1,6 @@
 import socket
 import json
-import sys
 import settings
-
-sys.path.append('..')
 
 
 class ClientProxy:
@@ -21,27 +18,27 @@ class ClientProxy:
         print(data)
         self.socket.send(json.dumps(data).encode('utf-8'))
 
-    def sendGameInfo(self, gameInfo):
+    def send_game_info(self, gameInfo):
         data = {
             'type': 'start',
             'info': gameInfo
         }
         self.send(data)
 
-    def sendStep(self, action):
+    def send_step(self, action):
         data = {
             'type': 'step',
             'action': action
         }
         self.send(data)
 
-    def sendGiveup(self):
+    def send_give_up(self):
         data = {
             'type': 'give up'
         }
         self.send(data)
 
-    def sendRetract(self):
+    def send_retract(self):
         data = {
             'type': 'retract'
         }

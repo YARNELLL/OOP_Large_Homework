@@ -6,37 +6,37 @@ from gui import MainWindow
 
 
 class GameClient(QThread):
+    setGameInfoSign = pyqtSignal(str, int, int)
+    setStateSign = pyqtSignal(object, int)
+    gameOverSign = pyqtSignal()
+    messageSign = pyqtSignal(str)
+
     def __init__(self, player_id):
         self.player_id = player_id
         self.state = None
         self.turn = None
         self.proxy = ClientProxy(player_id)
-
-        self.setGameInfoSign = pyqtSignal(str, int, int)
-        self.setStateSign = pyqtSignal(object, int)
-        self.gameOverSign = pyqtSignal()
-        self.messageSign = pyqtSignal(str)
         super(GameClient, self).__init__()
 
     def step(self, coord_x, coord_y):
-        self.proxy.sendStep([coord_x, coord_y])
+        self.proxy.send_step([coord_x, coord_y])
 
-    def gameStart(self, gameType, height, width):
+    def game_start(self, gameType, height, width):
         data = {
             'gameType': gameType,
             'height': height,
             'width': width
         }
-        self.proxy.sendGameInfo(data)
+        self.proxy.send_game_info(data)
 
-    def stepSkip(self):
-        self.proxy.sendStep([-1, -1])
+    def step_skip(self):
+        self.proxy.send_step([-1, -1])
 
-    def giveUp(self):
-        self.proxy.sendGiveup()
+    def give_up(self):
+        self.proxy.send_give_up()
 
     def retract(self):
-        self.proxy.sendRetract()
+        self.proxy.send_retract()
 
     def run(self):
         self.proxy.connect()
@@ -55,7 +55,7 @@ class GameClient(QThread):
 
 if __name__ == '__main__':
     app = QApplication([])
-
+    # 参数可选0，1，对应着用户编号
     client = GameClient(int(sys.argv[1]))
     w = MainWindow(client)
     w.show()

@@ -14,13 +14,13 @@ class MyEdit(QWidget):
     def __init__(self, label, text):
         super().__init__()
 
-        hlayout = QHBoxLayout()
-        self.setLayout(hlayout)
+        h_layout = QHBoxLayout()
+        self.setLayout(h_layout)
 
         self.label = QLabelCenter(label)
         self.edit = QLineEdit(text)
-        hlayout.addWidget(self.label, 1)
-        hlayout.addWidget(self.edit, 3)
+        h_layout.addWidget(self.label, 1)
+        h_layout.addWidget(self.edit, 3)
 
 
 class Grid(QWidget):
@@ -40,18 +40,20 @@ class Grid(QWidget):
 
         self.label = QLabelCenter()
         self.layout.addWidget(self.label)
-        self.setState(-1)
+        self.set_state(-1)
 
-    def setState(self, state):
-        GridPix = QPixmap('./img/grid.png')
-        WhitePiecePix = QPixmap('./img/white_piece.png')
-        BlackPiecePix = QPixmap('./img/black_piece.png')
+    def set_state(self, state):
+        grid_pix = QPixmap('./img/grid.png')
+        white_piece_pix = QPixmap('./img/white_piece.png')
+        black_piece_pix = QPixmap('./img/black_piece.png')
         if state == -1:
-            pix = GridPix
+            pix = grid_pix
         elif state == 0:
-            pix = BlackPiecePix
+            pix = black_piece_pix
         elif state == 1:
-            pix = WhitePiecePix
+            pix = white_piece_pix
+        else:
+            raise ValueError('Invalid state type {}'.format(state))
 
         self.label.setPixmap(pix.scaled(self.grid_size, self.grid_size))
 
@@ -79,6 +81,7 @@ class Chessboard(QWidget):
         self.height = height
         self.width = width
         grid_size = 50
+        # print("width:{},height:{}".format(width, height))
         self.setFixedSize(grid_size * width, grid_size * height)
 
         for i in range(height):
@@ -88,10 +91,10 @@ class Chessboard(QWidget):
                 self.grid_layout.addWidget(gird, *(i, j))
                 self.myGrid[(i, j)] = gird
 
-    def setState(self, state):
+    def set_state(self, state):
         for i in range(self.height):
             for j in range(self.width):
-                self.myGrid[(i, j)].setState(state[i][j])
+                self.myGrid[(i, j)].set_state(state[i][j])
 
 
 class Menu(QWidget):
@@ -101,12 +104,20 @@ class Menu(QWidget):
 
     def __init__(self, parent, client):
         super().__init__(parent)
+        self.giveUpButton = None
+        self.retractButton = None
+        self.skipButton = None
+        self.startButton = None
+        self.gameTypeBox = None
+        self.heightEdit = None
+        self.widthEdit = None
+        self.hintLabel = None
         self.client = client
-        self.initUI()
+        self.init_ui()
 
-    def initUI(self):
-        vlayout = QVBoxLayout()
-        self.setLayout(vlayout)
+    def init_ui(self):
+        v_layout = QVBoxLayout()
+        self.setLayout(v_layout)
 
         self.hintLabel = QLabelCenter('Wait for start.')
         self.widthEdit = MyEdit('Width', '8')
@@ -116,35 +127,35 @@ class Menu(QWidget):
         self.gameTypeBox.addItem("Gobang")
         self.gameTypeBox.addItem("Go")
         self.gameTypeBox.addItem("Reversi")
-        self.startButton = QPushButton('Start')
-        self.startButton.clicked.connect(self.gameStart)
+        self.startButton = QPushButton('start')
+        self.startButton.clicked.connect(self.game_start)
         self.skipButton = QPushButton('Skip')
-        self.skipButton.clicked.connect(self.stepSkip)
+        self.skipButton.clicked.connect(self.step_skip)
         self.retractButton = QPushButton('Retract')
         self.retractButton.clicked.connect(self.retract)
         self.giveUpButton = QPushButton('Give up')
-        self.giveUpButton.clicked.connect(self.giveUp)
+        self.giveUpButton.clicked.connect(self.give_up)
 
-        vlayout.addWidget(self.hintLabel)
-        vlayout.addWidget(self.widthEdit)
-        vlayout.addWidget(self.heightEdit)
-        vlayout.addWidget(self.gameTypeBox)
-        vlayout.addWidget(self.startButton)
-        vlayout.addWidget(self.skipButton)
-        vlayout.addWidget(self.retractButton)
-        vlayout.addWidget(self.giveUpButton)
+        v_layout.addWidget(self.hintLabel)
+        v_layout.addWidget(self.widthEdit)
+        v_layout.addWidget(self.heightEdit)
+        v_layout.addWidget(self.gameTypeBox)
+        v_layout.addWidget(self.startButton)
+        v_layout.addWidget(self.skipButton)
+        v_layout.addWidget(self.retractButton)
+        v_layout.addWidget(self.giveUpButton)
 
-    def gameStart(self):
-        gameType = self.gameTypeBox.currentText()
+    def game_start(self):
+        game_type = self.gameTypeBox.currentText()
         height = int(self.heightEdit.edit.text())
         width = int(self.widthEdit.edit.text())
-        self.client.gameStart(gameType, height, width)
+        self.client.game_start(game_type, height, width)
 
-    def stepSkip(self):
-        self.client.stepSkip()
+    def step_skip(self):
+        self.client.step_skip()
 
-    def giveUp(self):
-        self.client.giveUp()
+    def give_up(self):
+        self.client.give_up()
 
     def retract(self):
         self.client.retract()
@@ -153,14 +164,16 @@ class Menu(QWidget):
 class MainWindow(QMainWindow):
     def __init__(self, client):
         super().__init__()
+        self.menu = None
+        self.board = None
         self.client = client
-        self.client.setGameInfoSign.connect(self.setGameInfo)
-        self.client.setStateSign.connect(self.setState)
-        self.client.messageSign.connect(self.showMessage)
-        self.client.gameOverSign.connect(self.gameOver)
-        self.initUI()
+        self.client.setGameInfoSign.connect(self.set_game_info)
+        self.client.setStateSign.connect(self.set_state)
+        self.client.messageSign.connect(self.show_message)
+        self.client.gameOverSign.connect(self.game_over)
+        self.init_ui()
 
-    def initUI(self):
+    def init_ui(self):
         main_widget = QWidget(self)
         h_layout = QHBoxLayout()
         main_widget.setLayout(h_layout)
@@ -174,18 +187,20 @@ class MainWindow(QMainWindow):
         file = open('./client.qss', 'r')
         self.setStyleSheet(file.read())
 
-    def setGameInfo(self, gameType, height, width):
+    def set_game_info(self, game_type, height, width):
+        # game_type虽然没有用，但是不能删除，因为传入的参数有三个，去掉game_type会导致参数对应出问题
+        # print(game_type, height, width)
         self.board.reset(height, width)
 
-    def setState(self, state, turn):
-        self.board.setState(state)
+    def set_state(self, state, turn):
+        self.board.set_state(state)
         if turn == self.client.player_id:
             self.menu.hintLabel.setText('Your turn.')
         else:
             self.menu.hintLabel.setText('Wait for the opponent.')
 
-    def showMessage(self, message):
+    def show_message(self, message):
         QMessageBox.warning(self, 'Message', message)
 
-    def gameOver(self):
+    def game_over(self):
         self.menu.hintLabel.setText('Wait for start.')
