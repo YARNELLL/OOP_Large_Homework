@@ -6,13 +6,6 @@
   <component name="ChangeListManager">
     <list default="true" id="2a42c7a2-4e2d-444b-82c8-9d4a78f6b408" name="更改" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/client.py" beforeDir="false" afterPath="$PROJECT_DIR$/client/client.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/gui.py" beforeDir="false" afterPath="$PROJECT_DIR$/client/gui.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/proxy.py" beforeDir="false" afterPath="$PROJECT_DIR$/client/proxy.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/proxy.py" beforeDir="false" afterPath="$PROJECT_DIR$/server/proxy.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/rule.py" beforeDir="false" afterPath="$PROJECT_DIR$/server/rule.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/server.py" beforeDir="false" afterPath="$PROJECT_DIR$/server/server.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/settings.py" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -107,7 +100,7 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1702807317996</updated>
-      <workItem from="1702807494146" duration="12621000" />
+      <workItem from="1702807494146" duration="14900000" />
     </task>
     <servers />
   </component>
