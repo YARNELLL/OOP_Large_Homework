@@ -10,7 +10,7 @@ class GameServer:
     def game_loop(self):
         memory = MementoBox()
         game_info = self.proxy.send_game_start()
-        rule = create(game_info['gameType'],game_info['height'], game_info['width'])
+        rule = create(game_info['gameType'], game_info['height'], game_info['width'])
         rule.reset()
         memory.store(*rule.store())
         self.proxy.send_state(*rule.store())
