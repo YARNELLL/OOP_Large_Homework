@@ -7,13 +7,13 @@ class GameServer:
         self.proxy = ServerProxy()
         pass
 
-    def gameLoop(self):
+    def game_loop(self):
         memory = MementoBox()
-        gameInfo = self.proxy.sendGameStart()
-        rule = create(gameInfo['height'], gameInfo['width'])
+        game_info = self.proxy.send_game_start()
+        rule = create(game_info['gameType'],game_info['height'], game_info['width'])
         rule.reset()
         memory.store(*rule.store())
-        self.proxy.sendState(*rule.store())
+        self.proxy.send_state(*rule.store())
         while True:
             player_id, data = self.proxy.recv()
             if data['type'] == 'step':
@@ -24,40 +24,40 @@ class GameServer:
                 valid, message = rule.step(action)
                 if valid:
                     memory.store(rule.state, rule.turn)
-                    finish, winner = rule.judgeFinish()
-                    self.proxy.sendState(rule.state, rule.turn)
+                    finish, winner = rule.judge_finish()
+                    self.proxy.send_state(rule.state, rule.turn)
                     if finish:
                         break
                 else:
-                    self.proxy.sendMessage(message, player_id)
+                    self.proxy.send_message(message, player_id)
             elif data['type'] == 'retract':
                 successful, data = memory.retract(player_id)
                 rule.restore(*data)
-                self.proxy.sendState(rule.state, rule.turn)
+                self.proxy.send_state(rule.state, rule.turn)
                 if successful:
-                    self.proxy.sendMessage("Retract successfully.", player_id)
+                    self.proxy.send_message("Retract successfully.", player_id)
                 else:
-                    self.proxy.sendMessage("Retract error.", player_id)
+                    self.proxy.send_message("Retract error.", player_id)
             elif data['type'] == 'give up':
                 winner = player_id ^ 1
                 break
             elif data['type'] == 'start':
-                self.proxy.sendMessage('Please finish this game.', player_id)
+                self.proxy.send_message('Please finish this game.', player_id)
             else:
                 raise ValueError('Invalid action type {}'.format(data['type']))
 
-        self.proxy.sendGameOver(winner)
-        self.proxy.sendMessage('Game over. Winner is player {}'.format(winner))
+        self.proxy.send_game_over(winner)
+        self.proxy.send_message('Game over. Winner is player {}'.format(winner))
         result = {
             'winner': winner,
             'exit': False
         }
         return result
 
-    def mainLoop(self):
+    def main_loop(self):
         self.proxy.connect()
         while True:
-            result = self.gameLoop()
+            result = self.game_loop()
             print('Game over', result)
             if result['exit']:
                 break
@@ -66,4 +66,5 @@ class GameServer:
 
 if __name__ == "__main__":
     game = GameServer()
-    game.mainLoop()
+    print('Server started.')
+    game.main_loop()
