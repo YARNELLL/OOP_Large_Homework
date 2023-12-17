@@ -1,0 +1,6 @@
+Chessboard{
+    border: 3px solid #888;
+    border-radius: 10px;
+    background-image : url("./img/board.png");
+    padding: 0px, 0px, 0px, 0px;
+}
