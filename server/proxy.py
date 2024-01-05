@@ -1,10 +1,9 @@
 import socket
 import json
-import sys
 import time
 
-sys.path.append('./..')
-import settings
+PORT_LIST = [23200, 23201]
+HOST = 'localhost'
 
 
 class ServerProxy:
@@ -15,8 +14,8 @@ class ServerProxy:
         socket.setdefaulttimeout(0.2)
         self.socket = [socket.socket(), socket.socket()]
         self.client = [None] * 2
-        host = settings.HOST
-        for s, port in zip(self.socket, settings.PORT_LIST):
+        host = HOST
+        for s, port in zip(self.socket, PORT_LIST):
             s.bind((host, port))
             s.listen(5)
 
@@ -34,8 +33,10 @@ class ServerProxy:
                     connected[i] = True
         return username
 
-    def send(self, data, player_id=[0, 1]):
-        if not (type(player_id) == list):
+    def send(self, data, player_id=None):
+        if player_id is None:
+            player_id = [0, 1]
+        if not isinstance(player_id, list):
             player_id = [player_id]
 
         for p in player_id:
@@ -45,12 +46,12 @@ class ServerProxy:
         print(data)
         time.sleep(0.2)
 
-    def sendGameStart(self):
+    def send_game_start(self):
         while True:
             player_id, action = self.recv()
             if action['type'] == 'start':
                 break
-            self.sendMessage('Game not start.', player_id)
+            self.send_message('Game not start.', player_id)
         game_info = action['info']
 
         game_info_message = {
@@ -58,18 +59,18 @@ class ServerProxy:
             'info': game_info
         }
         self.send(game_info_message)
-        self.sendMessage('{} game start.'.format(game_info['gameType']))
+        self.send_message('{} game start.'.format(game_info['gameType']))
 
         return game_info, player_id
 
-    def sendGameOver(self, winner):
+    def send_game_over(self, winner):
         over_order = {
             'type': 'over',
             'winner': winner
         }
         self.send(over_order)
 
-    def sendState(self, state, turn):
+    def send_state(self, state, turn):
         data = {
             'type': 'state',
             'state': state,
@@ -77,21 +78,25 @@ class ServerProxy:
         }
         self.send(data)
 
-    def sendMessage(self, message, player_id=[0, 1]):
+    def send_message(self, message, player_id=None):
+        if player_id is None:
+            player_id = [0, 1]
         data = {
             'type': 'message',
             'message': message
         }
         self.send(data, player_id)
 
-    def sendUserData(self, data):
+    def send_user_data(self, data):
         data = {
             'type': 'user data',
             'data': data
         }
         self.send(data)
 
-    def recv(self, id=[0, 1]):
+    def recv(self, id=None):
+        if id is None:
+            id = [0, 1]
         while True:
             for player_id in id:
                 try:

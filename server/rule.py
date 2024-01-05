@@ -41,21 +41,22 @@ class BaseRule:
         self.turn = 0
         self.skip_time = 0
 
-    def vaildCoordinate(self, coord):
+    def valid_coordinate(self, coord):
         if any(coord < 0) or any(coord >= self.shape):
             return False
         return True
 
-    def vaildAction(self, action):
+    def valid_action(self, action):
+        print(action)
         coord, player_id = np.array(action['coord']), action['player_id']
-        return self.vaildCoordinate(coord)
+        return self.valid_coordinate(coord)
 
     def step(self, action):
-        if not self.vaildAction(action):
-            return False, "Invaild action"
+        if not self.valid_action(action):
+            return False, "Invalid action"
         return True, "Successfully"
 
-    def judgeFinish(self):
+    def judge_finish(self):
         pass
 
     def restore(self, state, turn, skip_time):
@@ -68,8 +69,8 @@ class BaseRule:
 
 
 class GobangRule(BaseRule):
-    def vaildAction(self, action):
-        if not super().vaildAction(action):
+    def valid_action(self, action):
+        if not super().valid_action(action):
             return False
         coord, player_id = action['coord'], action['player_id']
         if not self.state[coord[0]][coord[1]] == -1:
@@ -77,8 +78,8 @@ class GobangRule(BaseRule):
         return True
 
     def step(self, action):
-        if not self.vaildAction(action):
-            return False, "Invaild action"
+        if not self.valid_action(action):
+            return False, "Invalid action"
 
         coord, player_id = action['coord'], action['player_id']
         if player_id != self.turn:
@@ -88,7 +89,7 @@ class GobangRule(BaseRule):
         self.turn ^= 1
         return True, "Successfully"
 
-    def judgeFinish(self):
+    def judge_finish(self):
         state = self.state
         assert (np.min(state) >= -1)
         assert (np.max(state) <= 2)
@@ -104,7 +105,7 @@ class GobangRule(BaseRule):
                         space_count += 1
                         continue
                     last_pos = np.array([x, y]) - dir
-                    if self.vaildCoordinate(last_pos) and state[x][y] == state[last_pos[0]][last_pos[1]]:
+                    if self.valid_coordinate(last_pos) and state[x][y] == state[last_pos[0]][last_pos[1]]:
                         count[x][y] = count[last_pos[0]][last_pos[1]] + 1
                         if count[x][y] == 5:
                             win[state[x][y]] = True
@@ -122,7 +123,7 @@ class GobangRule(BaseRule):
 
 
 class GoRule(BaseRule):
-    def calcQi(self, state):
+    def calc_qi(self, state):
         qi = np.zeros(self.shape, dtype=np.int8)
         belong = np.zeros(self.shape, dtype=np.int8) - 1
         block_num = 0
@@ -139,7 +140,7 @@ class GoRule(BaseRule):
                         now = q.get()
                         for dir in DIRECTION_4:
                             next = now + dir
-                            if self.vaildCoordinate(next) and belong[next[0]][next[1]] == -1:
+                            if self.valid_coordinate(next) and belong[next[0]][next[1]] == -1:
                                 if state[next[0]][next[1]] == state[x][y]:
                                     belong[next[0]][next[1]] = block_num
                                     q.put(next)
@@ -150,20 +151,20 @@ class GoRule(BaseRule):
                     qi[x][y] = block_qi[belong[x][y]]
         return qi
 
-    def vaildAction(self, action):
-        if not super().vaildAction(action):
+    def valid_action(self, action):
+        if not super().valid_action(action):
             return False
         coord, player_id = action['coord'], action['player_id']
         if not self.state[coord[0]][coord[1]] == -1:
             return False
         self.state[coord[0]][coord[1]] = player_id
-        self.qi = self.calcQi(self.state)
+        self.qi = self.calc_qi(self.state)
         self.state[coord[0]][coord[1]] = -1
         if self.qi[coord[0]][coord[1]] == 0:
             remove = False
             for dir in DIRECTION_4:
                 next = coord + dir
-                if self.vaildCoordinate(next) and self.state[next[0]][next[1]] == (player_id ^ 1) and self.qi[next[0]][
+                if self.valid_coordinate(next) and self.state[next[0]][next[1]] == (player_id ^ 1) and self.qi[next[0]][
                     next[1]] == 0:
                     remove = True
             if remove == False:
@@ -181,8 +182,8 @@ class GoRule(BaseRule):
             self.turn ^= 1
             return True, "Successfully"
 
-        if not self.vaildAction(action):
-            return False, "Invaild action"
+        if not self.valid_action(action):
+            return False, "Invalid action"
 
         self.state[coord[0]][coord[1]] = player_id
         self.turn ^= 1
@@ -193,7 +194,7 @@ class GoRule(BaseRule):
                     self.state[x][y] = -1
         return True, "Successfully"
 
-    def judgeFinish(self):
+    def judge_finish(self):
         state = self.state
         assert (np.min(state) >= -1)
         assert (np.max(state) <= 2)
@@ -210,7 +211,7 @@ class GoRule(BaseRule):
             pos = q.get()
             for dir in DIRECTION_4:
                 next_pos = pos + dir
-                if self.vaildCoordinate(next_pos) and belong[next_pos[0]][next_pos[1]] == -1:
+                if self.valid_coordinate(next_pos) and belong[next_pos[0]][next_pos[1]] == -1:
                     belong[next_pos[0]][next_pos[1]] = belong[pos[0]][pos[1]]
                     q.put(next_pos)
         score = [np.sum(belong == pid) for pid in [0, 1]]
@@ -228,12 +229,12 @@ class ReversiRule(BaseRule):
         self.turn = 0
         self.skip_time = 0
 
-    def vaildAction(self, coord):
+    def valid_action(self, coord):
         action = {
             'coord': coord,
             'player_id': self.turn
         }
-        if not super().vaildAction(action) or not self.state[coord[0]][coord[1]] == -1:
+        if not super().valid_action(action) or not self.state[coord[0]][coord[1]] == -1:
             return False
 
         tmp_game = deepcopy(self)
@@ -249,16 +250,16 @@ class ReversiRule(BaseRule):
             self.turn ^= 1
             return True, "Successfully"
 
-        if not super().vaildAction(action):
-            return False, "Invaild action"
+        if not super().valid_action(action):
+            return False, "Invalid action"
 
         if not self.state[coord[0]][coord[1]] == -1:
-            return False, "Invaild action"
+            return False, "Invalid action"
 
-        nof_trunover = 0
+        nof_turn_over = 0
         for dir in DIRECTION_8:
             pos = np.array(coord)
-            while self.vaildCoordinate(pos + dir):
+            while self.valid_coordinate(pos + dir):
                 pos = pos + dir
                 if self.state[pos[0]][pos[1]] == -1:
                     break
@@ -267,16 +268,16 @@ class ReversiRule(BaseRule):
                     while pos[0] != coord[0] or pos[1] != coord[1]:
                         self.state[pos[0]][pos[1]] = player_id
                         pos -= dir
-                        nof_trunover += 1
+                        nof_turn_over += 1
                     break
-        if nof_trunover == 0:
-            return False, "Invaild action"
+        if nof_turn_over == 0:
+            return False, "Invalid action"
 
         self.state[coord[0]][coord[1]] = player_id
         self.turn ^= 1
         return True, "Successfully"
 
-    def judgeFinish(self):
+    def judge_finish(self):
         score = [np.sum(np.array(self.state) == pid) for pid in [0, 1]]
         done = False
         for i in [-1, 0, 1]:
@@ -284,7 +285,7 @@ class ReversiRule(BaseRule):
                 done = True
         return done, int(score[1] > score[0])
 
-    def getScore(self, turn=None):
+    def get_score(self, turn=None):
         score = [np.sum(np.array(self.state) == pid) for pid in [0, 1]]
         if turn is None:
             return score
@@ -292,13 +293,12 @@ class ReversiRule(BaseRule):
             return score[turn] - score[turn ^ 1]
 
 
-class RuleFactory:
-    def create(self, gameType, *argv):
-        if gameType == 'Gobang':
-            return GobangRule(*argv)
-        elif gameType == 'Go':
-            return GoRule(*argv)
-        elif gameType == 'Reversi':
-            return ReversiRule(*argv)
-        else:
-            raise ValueError("Invaild product name.")
+def create_rule(gameType, *argv):
+    if gameType == 'Gobang':
+        return GobangRule(*argv)
+    elif gameType == 'Go':
+        return GoRule(*argv)
+    elif gameType == 'Reversi':
+        return ReversiRule(*argv)
+    else:
+        raise ValueError("Invalid product name.")

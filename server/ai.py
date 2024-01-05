@@ -10,25 +10,25 @@ class BaseAI:
 
 class RandomAI(BaseAI):
     def act(self):
-        vaild_coord = []
+        valid_coord = []
         for i in range(self.game.height):
             for j in range(self.game.width):
                 coord = (i, j)
-                if self.game.vaildAction(coord):
-                    vaild_coord.append(coord)
+                if self.game.valid_action(coord):
+                    valid_coord.append(coord)
 
-        if len(vaild_coord) == 0:
-            return (-1, -1)
-        res = vaild_coord[np.random.randint(len(vaild_coord))]
-        print(vaild_coord, res)
+        if len(valid_coord) == 0:
+            return -1, -1
+        res = valid_coord[np.random.randint(len(valid_coord))]
+        print(valid_coord, res)
         return res
 
 
-class RuelAI(BaseAI):
+class RuleAI(BaseAI):
     def act(self, random=False):
         turn = self.game.turn
         coord_list = [(-1, -1)]
-        score_list = [self.game.getScore(turn)]
+        score_list = [self.game.get_score(turn)]
         for i in range(self.game.height):
             for j in range(self.game.width):
                 action = {
@@ -39,7 +39,7 @@ class RuelAI(BaseAI):
                 successful, _ = tmp_game.step(action)
                 if successful:
                     coord_list.append((i, j))
-                    score_list.append(tmp_game.getScore(turn))
+                    score_list.append(tmp_game.get_score(turn))
 
         score_list = np.exp(score_list)
         score_list /= np.sum(score_list)
@@ -61,14 +61,14 @@ class SearchAI(BaseAI):
                 'player_id': tmp_game.turn
             }
             tmp_game.step(action)
-            targetAI = RuelAI(tmp_game)
+            targetAI = RuleAI(tmp_game)
             for d in range(3):
                 action = {
                     'coord': targetAI.act(random=True),
                     'player_id': tmp_game.turn
                 }
                 tmp_game.step(action)
-            score += tmp_game.getScore(turn)
+            score += tmp_game.get_score(turn)
         return score / T
 
     def act(self):
@@ -77,7 +77,7 @@ class SearchAI(BaseAI):
         best_score = self.MCTS(best_coord)
         for i in range(self.game.height):
             for j in range(self.game.width):
-                if not self.game.vaildAction((i, j)):
+                if not self.game.valid_action((i, j)):
                     continue
                 score = self.MCTS((i, j))
                 if score > best_score:
@@ -87,13 +87,12 @@ class SearchAI(BaseAI):
         return best_coord
 
 
-class AIFactory:
-    def create(self, level, *argv):
-        if level == 1:
-            return RandomAI(*argv)
-        elif level == 2:
-            return RuelAI(*argv)
-        elif level == 3:
-            return SearchAI(*argv)
-        else:
-            raise ValueError("Invaild product name.")
+def create_ai(level, *argv):
+    if level == 1:
+        return RandomAI(*argv)
+    elif level == 2:
+        return RuleAI(*argv)
+    elif level == 3:
+        return SearchAI(*argv)
+    else:
+        raise ValueError("Invalid product name.")
