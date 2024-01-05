@@ -3,7 +3,6 @@ from PyQt5.QtWidgets import QApplication
 from PyQt5.QtCore import pyqtSignal, QThread
 from proxy import ClientProxy
 from gui import MainWindow
-import time
 
 
 class GameClient(QThread):
@@ -21,31 +20,31 @@ class GameClient(QThread):
         super(GameClient, self).__init__()
 
     def step(self, coord_x, coord_y):
-        self.proxy.sendStep([coord_x, coord_y])
+        self.proxy.send_step([coord_x, coord_y])
 
-    def gameStart(self, gameType, height, width):
+    def game_start(self, gameType, height, width):
         data = {
             'gameType': gameType,
             'height': height,
             'width': width
         }
-        self.proxy.sendGameInfo(data)
+        self.proxy.send_game_info(data)
 
-    def stepSkip(self):
-        self.proxy.sendStep([-1, -1])
+    def step_skip(self):
+        self.proxy.send_step([-1, -1])
 
-    def giveUp(self):
-        self.proxy.sendGiveup()
+    def give_up(self):
+        self.proxy.send_give_up()
 
     def retract(self):
-        self.proxy.sendRetract()
+        self.proxy.send_retract()
 
-    def AIAct(self, level):
-        self.proxy.sendAIAct(level)
+    def ai_act(self, level):
+        self.proxy.send_ai_act(level)
 
     def run(self):
         self.proxy.connect()
-        self.proxy.sendName(self.username)
+        self.proxy.send_name(self.username)
         while True:
             order = self.proxy.recv()
             if order['type'] == 'start':
@@ -63,7 +62,7 @@ class GameClient(QThread):
 
 if __name__ == '__main__':
     app = QApplication([])
-
+    # 可选0和1
     client = GameClient(int(sys.argv[1]))
     w = MainWindow(client)
     w.show()
