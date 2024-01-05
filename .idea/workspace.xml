@@ -6,18 +6,7 @@
   <component name="ChangeListManager">
     <list default="true" id="2a42c7a2-4e2d-444b-82c8-9d4a78f6b408" name="更改" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/client.py" beforeDir="false" afterPath="$PROJECT_DIR$/client/client.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/gui.py" beforeDir="false" afterPath="$PROJECT_DIR$/client/gui.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/proxy.py" beforeDir="false" afterPath="$PROJECT_DIR$/client/proxy.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/ai.py" beforeDir="false" afterPath="$PROJECT_DIR$/server/ai.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/proxy.py" beforeDir="false" afterPath="$PROJECT_DIR$/server/proxy.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/rule.py" beforeDir="false" afterPath="$PROJECT_DIR$/server/rule.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/server.py" beforeDir="false" afterPath="$PROJECT_DIR$/server/server.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/user.txt" beforeDir="false" afterPath="$PROJECT_DIR$/server/user.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/userData.py" beforeDir="false" afterPath="$PROJECT_DIR$/server/userData.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/settings.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/uml类图.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/第一阶段实验报告.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/2023214309_吴禹_大作业第二阶段实验报告.md" beforeDir="false" afterPath="$PROJECT_DIR$/2023214309_吴禹_大作业第二阶段实验报告.md" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -115,7 +104,7 @@
       <workItem from="1702807494146" duration="16467000" />
       <workItem from="1703419707192" duration="1221000" />
       <workItem from="1704106106261" duration="393000" />
-      <workItem from="1704458092369" duration="13534000" />
+      <workItem from="1704458092369" duration="16565000" />
     </task>
     <servers />
   </component>
